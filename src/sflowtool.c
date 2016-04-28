@@ -1239,6 +1239,7 @@ static void readPcapHeader() {
 
 #define DLT_EN10MB	1	  /* from libpcap-0.5: net/bpf.h */
 #define DLT_LINUX_SLL   113       /* Linux "cooked" encapsulation */
+#define DLT_IPV4       228 /* support captured ipv4 packet without ll header... */
 #define PCAP_VERSION_MAJOR 2      /* from libpcap-0.5: pcap.h */
 #define PCAP_VERSION_MINOR 4      /* from libpcap-0.5: pcap.h */
 
@@ -1268,7 +1269,12 @@ static void writePcapPacket(SFSample *sample) {
   char buf[2048];
   int bytes = 0;
   struct pcap_pkthdr hdr;
-  hdr.ts_sec = (uint32_t)time(NULL);
+  if (sample->pcapTimestamp) {
+    hdr.ts_sec = (uint32_t)sample->pcapTimestamp;
+  }
+  else {
+    hdr.ts_sec = (uint32_t)time(NULL);
+  }
   hdr.ts_usec = 0;
   hdr.len = sample->sampledPacketSize;
   hdr.caplen = sample->headerLen;
@@ -4362,6 +4368,10 @@ static int pcapOffsetToSFlow(uint8_t *start, int len)
   uint16_t type_len;
 
   switch(sfConfig.readPcapHdr.linktype) {
+  case DLT_IPV4:
+    /* no offset needed*/ 
+    type_len = 0x0800;
+    break;
   case DLT_LINUX_SLL:
     {
       uint16_t packet_type = (ptr[0] << 8) + ptr[1];
