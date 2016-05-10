@@ -1,0 +1,5 @@
+sflowtool (3.37-1) unstable; urgency=low
+
+  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+
+ -- Zhang Dongya <fortitude.zhang@gmail.com>  Tue, 10 May 2016 14:15:14 +0800
